@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DotSync — Privacy Policy</title>
+  <style>
+    :root {
+      --primary: #00C2A8;
+      --surface-dark: #1a1a2e;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; color: #1a1a2e; background: #fff; line-height: 1.7; }
+
+    header {
+      background: var(--surface-dark); color: #fff;
+      padding: 20px 32px; display: flex; align-items: center; gap: 12px;
+    }
+    .logo-dot {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), #0090D9);
+      flex-shrink: 0;
+    }
+    header h1 { font-size: 1.1rem; font-weight: 700; }
+    header span { font-size: 0.85rem; opacity: 0.6; margin-left: 4px; }
+
+    main { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+
+    .lang-toggle { display: flex; gap: 8px; margin-bottom: 36px; }
+    .lang-btn {
+      border: 1.5px solid #e2e2ec; background: #f8f9ff; border-radius: 6px;
+      padding: 5px 14px; font-size: 0.82rem; cursor: pointer; color: #64748b;
+      transition: border-color .15s, color .15s;
+    }
+    .lang-btn.active { border-color: var(--primary); color: var(--primary); font-weight: 600; }
+
+    section { display: none; }
+    section.active { display: block; }
+
+    h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 4px; }
+    .updated { font-size: 0.8rem; color: #94a3b8; margin-bottom: 32px; }
+    h3 { font-size: 1rem; font-weight: 700; margin: 28px 0 8px; color: var(--surface-dark); }
+    p { color: #374151; margin-bottom: 12px; }
+    ul { color: #374151; padding-left: 20px; margin-bottom: 12px; }
+    ul li { margin-bottom: 4px; }
+    .note {
+      background: #f0fdfb; border-left: 3px solid var(--primary);
+      padding: 12px 16px; border-radius: 0 8px 8px 0;
+      font-size: 0.88rem; color: #374151; margin: 20px 0;
+    }
+    a { color: var(--primary); }
+    footer { text-align: center; padding: 24px; font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #f0f0f5; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-dot"></div>
+  <h1>DotSync <span>Privacy Policy</span></h1>
+</header>
+
+<main>
+  <div class="lang-toggle">
+    <button class="lang-btn active" onclick="setLang('en')">English</button>
+    <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+  </div>
+
+  <!-- ── English ── -->
+  <section id="en" class="active">
+    <h2>Privacy Policy</h2>
+    <p class="updated">Last updated: June 2026</p>
+
+    <div class="note">
+      DotSync does not collect, store, or sell any personal information.
+      Cursor position data is relayed in real time and never persisted on the server.
+    </div>
+
+    <h3>1. What data is transmitted</h3>
+    <p>When DotSync is active (a room code is set), the following data is sent to the relay server on each mouse movement:</p>
+    <ul>
+      <li><strong>Cursor position</strong> — the CSS selector of the element under the pointer and its relative coordinates (0–1). No absolute pixel coordinates are transmitted.</li>
+      <li><strong>Display name</strong> — the name you entered in the popup, or a randomly generated one.</li>
+      <li><strong>Marker color</strong> — a randomly assigned color.</li>
+      <li><strong>Marker style</strong> — dot, ring, or arrow (your choice in the popup).</li>
+    </ul>
+
+    <h3>2. How data is used</h3>
+    <p>The relay server (<code>cursor-sharing-demo.onrender.com</code>) forwards cursor data only to other users in the same room. The room is determined by the combination of the page URL and your room code, so data is never shared with users outside your room.</p>
+    <p>The server does <strong>not</strong> log, store, or analyze any cursor data. Data exists only in memory for the duration of the connection.</p>
+
+    <h3>3. Local storage</h3>
+    <p>The extension stores the following in <code>chrome.storage.sync</code> (synced to your Google account if signed in):</p>
+    <ul>
+      <li>Room code</li>
+      <li>Display name</li>
+      <li>Marker style preference</li>
+    </ul>
+    <p>This data never leaves your device except via Chrome's own sync mechanism.</p>
+
+    <h3>4. Third parties</h3>
+    <p>DotSync does not share any data with third parties. No analytics, advertising, or tracking services are used.</p>
+
+    <h3>5. Contact</h3>
+    <p>If you have questions about this policy, please open an issue on the
+      <a href="https://github.com/SunSki/cursor-sharing-demo" target="_blank">GitHub repository</a>.
+    </p>
+  </section>
+
+  <!-- ── 日本語 ── -->
+  <section id="ja">
+    <h2>プライバシーポリシー</h2>
+    <p class="updated">最終更新: 2026年6月</p>
+
+    <div class="note">
+      DotSync は個人情報を収集・保存・販売しません。
+      カーソル位置データはリアルタイムで中継されるのみで、サーバーに保存されることはありません。
+    </div>
+
+    <h3>1. 送信されるデータ</h3>
+    <p>DotSync が有効（ルームコードが設定されている）のとき、マウスを動かすたびに以下のデータがリレーサーバーに送信されます。</p>
+    <ul>
+      <li><strong>カーソル位置</strong> — ポインタ下のDOM要素のCSSセレクタと、その要素内の相対座標（0〜1）。絶対ピクセル座標は送信しません。</li>
+      <li><strong>表示名</strong> — ポップアップで設定した名前、または自動生成されたランダムな名前。</li>
+      <li><strong>マーカーの色</strong> — ランダムに割り当てられた色。</li>
+      <li><strong>マーカーの種類</strong> — ドット・リング・矢印のいずれか（ポップアップで選択）。</li>
+    </ul>
+
+    <h3>2. データの利用方法</h3>
+    <p>リレーサーバー（<code>cursor-sharing-demo.onrender.com</code>）は、受け取ったカーソルデータを同じルームの他のユーザーにのみ転送します。ルームはページURLとルームコードの組み合わせで決まるため、意図しないユーザーにデータが届くことはありません。</p>
+    <p>サーバーはカーソルデータを<strong>記録・保存・分析しません</strong>。データは接続中のみメモリ上に存在し、切断と同時に消えます。</p>
+
+    <h3>3. ローカルストレージ</h3>
+    <p>拡張機能は以下の情報を <code>chrome.storage.sync</code> に保存します（Chromeにサインインしている場合はGoogleアカウント経由でデバイス間同期されます）。</p>
+    <ul>
+      <li>ルームコード</li>
+      <li>表示名</li>
+      <li>マーカーの種類の設定</li>
+    </ul>
+    <p>このデータはChromeの同期機能以外では端末外に送信されません。</p>
+
+    <h3>4. 第三者への提供</h3>
+    <p>DotSync はいかなるデータも第三者に提供しません。アナリティクス・広告・トラッキングサービスは一切使用していません。</p>
+
+    <h3>5. お問い合わせ</h3>
+    <p>このポリシーに関するご質問は
+      <a href="https://github.com/SunSki/cursor-sharing-demo" target="_blank">GitHubリポジトリ</a>
+      のIssueからお願いします。
+    </p>
+  </section>
+</main>
+
+<footer>© 2026 DotSync</footer>
+
+<script>
+  function setLang(lang) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(lang).classList.add('active');
+    document.querySelector('[onclick="setLang(\'' + lang + '\')"]').classList.add('active');
+  }
+</script>
+</body>
+</html>
