@@ -37,7 +37,7 @@
     return el;
   }
 
-  function start(code, name, color) {
+  function start(code, name, color, markerStyle) {
     if (session || !code) return;
     var room = location.origin + location.pathname + ':' + code;
     badge = makeBadge();
@@ -47,6 +47,7 @@
       room: room,
       name: name || undefined,
       color: color || undefined,
+      markerStyle: markerStyle || 'dot',
       onPresence: function (n) {
         var b = badge && badge.querySelector('[data-livecursors-count]');
         if (b) b.textContent = n;
@@ -59,21 +60,21 @@
     if (badge) { badge.remove(); badge = null; }
   }
 
-  function restart(code, name, color) { stop(); start(code, name, color); }
+  function restart(code, name, color, markerStyle) { stop(); start(code, name, color, markerStyle); }
 
   // Start only if a room code is set.
-  chrome.storage.sync.get(['roomCode', 'userName', 'userColor'], function (cfg) {
+  chrome.storage.sync.get(['roomCode', 'userName', 'userColor', 'markerStyle'], function (cfg) {
     var code = (cfg.roomCode || '').trim();
-    if (code) start(code, cfg.userName, cfg.userColor);
+    if (code) start(code, cfg.userName, cfg.userColor, cfg.markerStyle);
   });
 
   // React to popup changes live (no page reload needed).
   chrome.storage.onChanged.addListener(function (changes, area) {
     if (area !== 'sync') return;
-    if (changes.roomCode || changes.userName || changes.userColor) {
-      chrome.storage.sync.get(['roomCode', 'userName', 'userColor'], function (cfg) {
+    if (changes.roomCode || changes.userName || changes.userColor || changes.markerStyle) {
+      chrome.storage.sync.get(['roomCode', 'userName', 'userColor', 'markerStyle'], function (cfg) {
         var code = (cfg.roomCode || '').trim();
-        if (code) restart(code, cfg.userName, cfg.userColor);
+        if (code) restart(code, cfg.userName, cfg.userColor, cfg.markerStyle);
         else stop();
       });
     }

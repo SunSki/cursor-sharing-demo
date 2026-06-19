@@ -2,10 +2,10 @@ const codeEl = document.getElementById('roomCode');
 const nameEl = document.getElementById('userName');
 const genEl = document.getElementById('gen');
 const statusEl = document.getElementById('status');
+const markerPicker = document.getElementById('markerPicker');
 
 const MAX = 20;
 
-// Apply Chrome i18n strings to the UI.
 function applyI18n() {
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.dataset.i18n;
@@ -27,18 +27,23 @@ function updateStatus() {
   }
 }
 
+function setActiveMarker(style) {
+  markerPicker.querySelectorAll('.marker-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.style === style);
+  });
+}
+
 applyI18n();
 
-// Load current settings.
-chrome.storage.sync.get(['roomCode', 'userName'], (cfg) => {
+chrome.storage.sync.get(['roomCode', 'userName', 'markerStyle'], (cfg) => {
   codeEl.value = cfg.roomCode || '';
   nameEl.value = cfg.userName || '';
+  setActiveMarker(cfg.markerStyle || 'dot');
   updateStatus();
 });
 
-// Generate a readable random code (8 chars, no ambiguous letters).
 function generateCode() {
-  const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789'; // no i/l/o/0/1
+  const alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
   const buf = new Uint8Array(8);
   crypto.getRandomValues(buf);
   let s = '';
@@ -46,7 +51,7 @@ function generateCode() {
     s += alphabet[buf[i] % alphabet.length];
     if (i === 3) s += '-';
   }
-  return s; // e.g. "a3f9-k2m7"
+  return s;
 }
 
 let saveTimer = null;
@@ -63,6 +68,14 @@ genEl.addEventListener('click', () => {
   codeEl.value = generateCode();
   updateStatus();
   chrome.storage.sync.set({ roomCode: codeEl.value });
+});
+
+markerPicker.addEventListener('click', (e) => {
+  const btn = e.target.closest('.marker-btn');
+  if (!btn) return;
+  const style = btn.dataset.style;
+  setActiveMarker(style);
+  chrome.storage.sync.set({ markerStyle: style });
 });
 
 let nameTimer = null;

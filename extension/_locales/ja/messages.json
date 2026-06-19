@@ -39,5 +39,17 @@
   },
   "badgeLabel": {
     "message": "DotSync"
+  },
+  "labelMarkerStyle": {
+    "message": "マーカーの種類"
+  },
+  "markerDot": {
+    "message": "ドット"
+  },
+  "markerRing": {
+    "message": "リング"
+  },
+  "markerArrow": {
+    "message": "矢印"
   }
 }

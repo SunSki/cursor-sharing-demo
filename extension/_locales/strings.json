@@ -49,5 +49,21 @@
   "badgeLabel": {
     "en": "DotSync",
     "ja": "DotSync"
+  },
+  "labelMarkerStyle": {
+    "en": "Marker style",
+    "ja": "マーカーの種類"
+  },
+  "markerDot": {
+    "en": "Dot",
+    "ja": "ドット"
+  },
+  "markerRing": {
+    "en": "Ring",
+    "ja": "リング"
+  },
+  "markerArrow": {
+    "en": "Arrow",
+    "ja": "矢印"
   }
 }

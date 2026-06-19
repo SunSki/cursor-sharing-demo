@@ -18,6 +18,16 @@
     .status { font-size: 0.78rem; padding: 8px 10px; border-radius: 8px; text-align: center; font-weight: 600; }
     .status.on  { background: #ecfdf5; color: #059669; }
     .status.off { background: #f1f5f9; color: #64748b; }
+    /* Marker picker */
+    .marker-picker { display: flex; gap: 6px; }
+    .marker-btn {
+      flex: 1; border: 2px solid #e2e2ec; background: #f8f9ff;
+      border-radius: 8px; padding: 8px 4px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      font-size: 0.72rem; color: #64748b; transition: border-color .15s, background .15s;
+    }
+    .marker-btn.active { border-color: #6366f1; background: #eef2ff; color: #6366f1; font-weight: 600; }
+    .marker-btn:hover:not(.active) { border-color: #a5b4fc; }
     .note { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; border-top: 1px solid #f0f0f5; padding-top: 12px; }
   </style>
 </head>
@@ -31,6 +41,27 @@
       <div class="code-row">
         <input type="text" id="roomCode" maxlength="20" autocomplete="off">
         <button class="gen" id="gen" data-i18n="btnGenerate"></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <span data-i18n="labelMarkerStyle"></span>
+      <div class="marker-picker" id="markerPicker">
+        <button class="marker-btn active" data-style="dot">
+          <!-- filled circle -->
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="#6366f1" stroke="#fff" stroke-width="1.5"/></svg>
+          <span data-i18n="markerDot"></span>
+        </button>
+        <button class="marker-btn" data-style="ring">
+          <!-- outline circle -->
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4.5" fill="none" stroke="#6366f1" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#fff" stroke-width="1"/></svg>
+          <span data-i18n="markerRing"></span>
+        </button>
+        <button class="marker-btn" data-style="arrow">
+          <!-- cursor arrow -->
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="#6366f1" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <span data-i18n="markerArrow"></span>
+        </button>
       </div>
     </div>
 

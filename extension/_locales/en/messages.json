@@ -39,5 +39,17 @@
   },
   "badgeLabel": {
     "message": "DotSync"
+  },
+  "labelMarkerStyle": {
+    "message": "Marker style"
+  },
+  "markerDot": {
+    "message": "Dot"
+  },
+  "markerRing": {
+    "message": "Ring"
+  },
+  "markerArrow": {
+    "message": "Arrow"
   }
 }

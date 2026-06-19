@@ -95,6 +95,7 @@
 
     var name  = opts.name  || 'User-' + Math.random().toString(36).slice(2, 6).toUpperCase();
     var color = opts.color || COLORS[Math.floor(Math.random() * COLORS.length)];
+    var markerStyle = opts.markerStyle || 'dot'; // 'dot' | 'ring' | 'arrow'
     var throttleMs = opts.throttleMs != null ? opts.throttleMs : 50;
     var idleMs = opts.idleMs != null ? opts.idleMs : 5000;
     var zIndex = opts.zIndex != null ? opts.zIndex : 2147483646;
@@ -109,20 +110,39 @@
 
     var remotes = {}; // id -> { el, path, rx, ry }
 
-    function makeCursorEl(c, n) {
+    var LABEL = ';color:#fff;font:600 11px/1 -apple-system,sans-serif;padding:3px 7px;border-radius:10px;white-space:nowrap;';
+
+    function makeCursorEl(c, n, style) {
       var el = document.createElement('div');
       el.style.cssText = 'position:absolute;left:0;top:0;will-change:transform;' +
         'transition:transform .08s linear;display:none;';
 
-      // On-screen pointer: dot + name label.
       var pointer = document.createElement('div');
-      pointer.style.cssText = 'position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;';
-      pointer.innerHTML =
-        '<div style="width:12px;height:12px;border-radius:50%;background:' + c +
-          ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);flex-shrink:0;"></div>' +
-        '<span style="background:' + c +
-          ';color:#fff;font:600 11px/1 -apple-system,sans-serif;padding:3px 7px;' +
-          'border-radius:10px;white-space:nowrap;">' + n + '</span>';
+
+      if (style === 'arrow') {
+        // Classic cursor arrow — tip is at (0,0).
+        pointer.style.cssText = 'position:absolute;left:0;top:0;';
+        pointer.innerHTML =
+          '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" ' +
+            'style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">' +
+            '<path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="' + c + '" ' +
+              'stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>' +
+          '<span style="position:absolute;left:16px;top:16px;background:' + c + LABEL + '">' + n + '</span>';
+      } else if (style === 'ring') {
+        // Hollow ring — centre of ring is at (0,0) via translate.
+        pointer.style.cssText = 'position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;';
+        pointer.innerHTML =
+          '<div style="width:12px;height:12px;border-radius:50%;background:transparent;' +
+            'border:2.5px solid ' + c + ';box-shadow:0 0 0 1.5px #fff,0 1px 4px rgba(0,0,0,.3);flex-shrink:0;"></div>' +
+          '<span style="background:' + c + LABEL + '">' + n + '</span>';
+      } else {
+        // Dot (default) — filled circle.
+        pointer.style.cssText = 'position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;';
+        pointer.innerHTML =
+          '<div style="width:12px;height:12px;border-radius:50%;background:' + c +
+            ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);flex-shrink:0;"></div>' +
+          '<span style="background:' + c + LABEL + '">' + n + '</span>';
+      }
 
       // Off-screen edge marker: chevron (▲/▼) + name, pinned to top/bottom edge.
       var edge = document.createElement('div');
@@ -209,7 +229,7 @@
         p: path,
         x: rect.width  ? r3((e.clientX - rect.left) / rect.width)  : 0,
         y: rect.height ? r3((e.clientY - rect.top)  / rect.height) : 0,
-        n: name, c: color
+        n: name, c: color, s: markerStyle
       });
       shown = true;
     }
@@ -231,7 +251,7 @@
 
       socket.on('cursor', function (d) {
         var r = remotes[d.id];
-        if (!r) { r = { el: makeCursorEl(d.c, d.n) }; layer.appendChild(r.el); remotes[d.id] = r; }
+        if (!r) { r = { el: makeCursorEl(d.c, d.n, d.s) }; layer.appendChild(r.el); remotes[d.id] = r; }
         r.path = d.p; r.rx = d.x; r.ry = d.y;
         place(r);
       });
