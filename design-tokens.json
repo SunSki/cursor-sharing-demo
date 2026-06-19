@@ -1,0 +1,17 @@
+{
+  "_comment": "DotSync design tokens — source of truth for colors and spacing.",
+
+  "color": {
+    "primary":      "#00C2A8",
+    "primaryDark":  "#00A892",
+    "primaryLight": "#E6FAF8",
+    "primaryMid":   "#7DDFD4",
+    "surfaceDark":  "#1a1a2e",
+    "white":        "#ffffff",
+    "textMuted":    "#64748b",
+    "border":       "#e2e2ec",
+    "borderLight":  "#f0f0f5",
+    "statusOn":     { "bg": "#ecfdf5", "text": "#059669" },
+    "statusOff":    { "bg": "#f1f5f9", "text": "#64748b" }
+  }
+}

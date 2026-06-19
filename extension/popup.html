@@ -3,9 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <style>
-    body { width: 270px; margin: 0; font-family: system-ui, sans-serif; color: #1a1a2e; background: #fff; }
-    .head { background: #1a1a2e; color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
-    .head .mark { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg,#6366f1,#a855f7); }
+    :root {
+      --primary:       #00C2A8;
+      --primary-dark:  #00A892;
+      --primary-light: #E6FAF8;
+      --primary-mid:   #7DDFD4;
+      --surface-dark:  #1a1a2e;
+    }
+    body { width: 270px; margin: 0; font-family: system-ui, sans-serif; color: var(--surface-dark); background: #fff; }
+    .head { background: var(--surface-dark); color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
+    .head .mark { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg, var(--primary), #0090D9); }
     .head h1 { font-size: 0.95rem; margin: 0; }
     .body { padding: 16px; display: grid; gap: 16px; }
     .field { display: grid; gap: 6px; }
@@ -13,8 +20,8 @@
     .code-row { display: flex; gap: 6px; }
     input[type=text] { flex: 1; width: 100%; padding: 8px 10px; border: 1px solid #e2e2ec; border-radius: 8px; font-size: 0.88rem; box-sizing: border-box; }
     #roomCode { font-family: ui-monospace, monospace; letter-spacing: 0.5px; }
-    .gen { flex: 0 0 auto; border: none; background: #6366f1; color: #fff; border-radius: 8px; padding: 0 10px; font-size: 0.8rem; cursor: pointer; }
-    .gen:hover { background: #5558e0; }
+    .gen { flex: 0 0 auto; border: none; background: var(--primary); color: #fff; border-radius: 8px; padding: 0 10px; font-size: 0.8rem; cursor: pointer; }
+    .gen:hover { background: var(--primary-dark); }
     .status { font-size: 0.78rem; padding: 8px 10px; border-radius: 8px; text-align: center; font-weight: 600; }
     .status.on  { background: #ecfdf5; color: #059669; }
     .status.off { background: #f1f5f9; color: #64748b; }
@@ -26,8 +33,8 @@
       display: flex; flex-direction: column; align-items: center; gap: 5px;
       font-size: 0.72rem; color: #64748b; transition: border-color .15s, background .15s;
     }
-    .marker-btn.active { border-color: #6366f1; background: #eef2ff; color: #6366f1; font-weight: 600; }
-    .marker-btn:hover:not(.active) { border-color: #a5b4fc; }
+    .marker-btn.active { border-color: var(--primary); background: var(--primary-light); color: var(--primary); font-weight: 600; }
+    .marker-btn:hover:not(.active) { border-color: var(--primary-mid); }
     .note { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; border-top: 1px solid #f0f0f5; padding-top: 12px; }
   </style>
 </head>
@@ -48,18 +55,15 @@
       <span data-i18n="labelMarkerStyle"></span>
       <div class="marker-picker" id="markerPicker">
         <button class="marker-btn active" data-style="dot">
-          <!-- filled circle -->
-          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="#6366f1" stroke="#fff" stroke-width="1.5"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="var(--primary)" stroke="#fff" stroke-width="1.5"/></svg>
           <span data-i18n="markerDot"></span>
         </button>
         <button class="marker-btn" data-style="ring">
-          <!-- outline circle -->
-          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4.5" fill="none" stroke="#6366f1" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#fff" stroke-width="1"/></svg>
+          <svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4.5" fill="none" stroke="var(--primary)" stroke-width="2"/><circle cx="8" cy="8" r="6" fill="none" stroke="#fff" stroke-width="1"/></svg>
           <span data-i18n="markerRing"></span>
         </button>
         <button class="marker-btn" data-style="arrow">
-          <!-- cursor arrow -->
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="#6366f1" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="var(--primary)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/></svg>
           <span data-i18n="markerArrow"></span>
         </button>
       </div>

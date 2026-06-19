@@ -30,7 +30,7 @@
       'opacity:0', 'transition:opacity .3s'
     ].join(';');
     el.innerHTML =
-      '<span style="width:8px;height:8px;border-radius:50%;background:#4ade80;"></span>' +
+      '<span style="width:8px;height:8px;border-radius:50%;background:#00C2A8;"></span>' +
       '<span>' + chrome.i18n.getMessage('badgeLabel') + ' <b data-livecursors-count>1</b></span>';
     document.body.appendChild(el);
     requestAnimationFrame(function () { el.style.opacity = '1'; });
