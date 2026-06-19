@@ -1,12 +1,12 @@
 {
   "extName": {
-    "message": "LiveCursors — Share cursors on the same page"
+    "message": "DotSync — Share cursors on the same page"
   },
   "extDescription": {
     "message": "See each other's cursors in real time when you and your teammates open the same URL."
   },
   "actionTitle": {
-    "message": "LiveCursors"
+    "message": "DotSync"
   },
   "statusOn": {
     "message": "ON — Room \"$CODE$\"",
@@ -38,6 +38,6 @@
     "message": "Anyone with the same code on the same page will see your cursor. Share the code only with people you trust."
   },
   "badgeLabel": {
-    "message": "LiveCursors"
+    "message": "DotSync"
   }
 }

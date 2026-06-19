@@ -1,5 +1,5 @@
 /*!
- * @livecursors/client — drop-in real-time cursor sharing for any website.
+ * @livecursors/client (DotSync) — drop-in real-time dot sharing for any website.
  *
  * Two ways to use it:
  *
@@ -23,7 +23,7 @@
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
-  else root.LiveCursors = factory();
+  else root.DotSync = factory();
 }(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
@@ -43,7 +43,7 @@
       var s = document.createElement('script');
       s.src = url; s.async = true;
       s.onload = function () { resolve(window.io); };
-      s.onerror = function () { reject(new Error('LiveCursors: failed to load socket.io from ' + url)); };
+      s.onerror = function () { reject(new Error('DotSync: failed to load socket.io from ' + url)); };
       document.head.appendChild(s);
     });
   }
@@ -114,15 +114,13 @@
       el.style.cssText = 'position:absolute;left:0;top:0;will-change:transform;' +
         'transition:transform .08s linear;display:none;';
 
-      // On-screen pointer: arrow + name label.
+      // On-screen pointer: dot + name label.
       var pointer = document.createElement('div');
-      pointer.style.cssText = 'position:absolute;left:0;top:0;';
+      pointer.style.cssText = 'position:absolute;left:0;top:0;display:flex;align-items:center;gap:6px;';
       pointer.innerHTML =
-        '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" ' +
-          'style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">' +
-          '<path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="' + c + '" ' +
-            'stroke="white" stroke-width="1.5" stroke-linejoin="round"/></svg>' +
-        '<span style="position:absolute;left:18px;top:18px;background:' + c +
+        '<div style="width:12px;height:12px;border-radius:50%;background:' + c +
+          ';border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);flex-shrink:0;"></div>' +
+        '<span style="background:' + c +
           ';color:#fff;font:600 11px/1 -apple-system,sans-serif;padding:3px 7px;' +
           'border-radius:10px;white-space:nowrap;">' + n + '</span>';
 

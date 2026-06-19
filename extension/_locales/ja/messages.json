@@ -1,12 +1,12 @@
 {
   "extName": {
-    "message": "LiveCursors — 同じページのカーソルを共有"
+    "message": "DotSync — 同じページのカーソルを共有"
   },
   "extDescription": {
     "message": "拡張機能を入れた人同士が同じURLを開いているとき、お互いのカーソルをリアルタイムで表示します。"
   },
   "actionTitle": {
-    "message": "LiveCursors"
+    "message": "DotSync"
   },
   "statusOn": {
     "message": "ON — ルーム「$CODE$」",
@@ -38,6 +38,6 @@
     "message": "同じコードを入力した人が同じページを開いていると、お互いのカーソルが見えます。コードを共有したい相手にだけ伝えてください。"
   },
   "badgeLabel": {
-    "message": "LiveCursors"
+    "message": "DotSync"
   }
 }

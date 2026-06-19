@@ -2,7 +2,7 @@
  * LiveCursors content script.
  *
  * Loaded after lib/socket.io.min.js and lib/livecursors.js (same isolated
- * world), so `window.io` and `window.LiveCursors` are already available here.
+ * world), so `window.io` and `window.DotSync` are already available here.
  *
  * Privacy model: cursor sharing only runs when the user has set a ROOM CODE
  * in the popup. The room is `origin + pathname + ":" + code`, so only people
@@ -15,7 +15,7 @@
   var SIO_PATH = '/livecursors';
 
   if (!/^https?:$/.test(location.protocol)) return;
-  if (!window.LiveCursors || !window.io) return;
+  if (!window.DotSync || !window.io) return;
 
   var session = null;
   var badge = null;
@@ -41,7 +41,7 @@
     if (session || !code) return;
     var room = location.origin + location.pathname + ':' + code;
     badge = makeBadge();
-    session = window.LiveCursors.init({
+    session = window.DotSync.init({
       server: RELAY,
       path: SIO_PATH,
       room: room,

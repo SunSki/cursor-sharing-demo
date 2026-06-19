@@ -1,6 +1,6 @@
-# LiveCursors
+# DotSync / LiveCursors
 
-リアルタイムカーソル共有を既存のWebサイトに追加できるパッケージです。
+リアルタイムドット共有（カーソル位置マーカー）を既存のWebサイトに追加できるパッケージです。
 
 - **`@livecursors/server`** — 既存の Node HTTP サーバーにリレーを追加
 - **`@livecursors/client`** — `<script>` 1行でどのページにも組み込める

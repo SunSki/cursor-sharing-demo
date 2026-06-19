@@ -2,16 +2,16 @@
   "_comment": "Single source of truth for all extension UI strings. Run `npm run locales` to regenerate en/ and ja/messages.json. Never edit those files directly.",
 
   "extName": {
-    "en": "LiveCursors — Share cursors on the same page",
-    "ja": "LiveCursors — 同じページのカーソルを共有"
+    "en": "DotSync — Share cursors on the same page",
+    "ja": "DotSync — 同じページのカーソルを共有"
   },
   "extDescription": {
     "en": "See each other's cursors in real time when you and your teammates open the same URL.",
     "ja": "拡張機能を入れた人同士が同じURLを開いているとき、お互いのカーソルをリアルタイムで表示します。"
   },
   "actionTitle": {
-    "en": "LiveCursors",
-    "ja": "LiveCursors"
+    "en": "DotSync",
+    "ja": "DotSync"
   },
   "statusOn": {
     "en": "ON — Room \"$CODE$\"",
@@ -47,7 +47,7 @@
     "ja": "同じコードを入力した人が同じページを開いていると、お互いのカーソルが見えます。コードを共有したい相手にだけ伝えてください。"
   },
   "badgeLabel": {
-    "en": "LiveCursors",
-    "ja": "LiveCursors"
+    "en": "DotSync",
+    "ja": "DotSync"
   }
 }
