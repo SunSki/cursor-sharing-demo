@@ -97,7 +97,7 @@
     var color = opts.color || COLORS[Math.floor(Math.random() * COLORS.length)];
     var markerStyle = opts.markerStyle || 'dot'; // 'dot' | 'ring' | 'arrow'
     var throttleMs = opts.throttleMs != null ? opts.throttleMs : 50;
-    var idleMs = opts.idleMs != null ? opts.idleMs : 5000;
+    var idleMs = opts.idleMs != null ? opts.idleMs : 60000;
     var zIndex = opts.zIndex != null ? opts.zIndex : 2147483646;
     var socketUrl = opts.socketUrl || DEFAULT_SOCKETIO;
     var onPresence = typeof opts.onPresence === 'function' ? opts.onPresence : null;
