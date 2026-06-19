@@ -3,347 +3,288 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cursor Sharing — リアルタイムカーソル共有</title>
+  <title>Halo — チームのための共同作業ツール</title>
   <style>
+    :root {
+      --bg: #fbfbfd;
+      --ink: #14141c;
+      --muted: #6b6b7b;
+      --brand: #6366f1;
+      --brand-2: #a855f7;
+      --line: #e8e8ef;
+    }
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #060610;
-      overflow: hidden;
-      cursor: none;
-      user-select: none;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    /* Fixed-size canvas — CSS transform scales it to fit any screen */
-    #canvas {
-      position: absolute;
-      width: 1440px;
-      height: 900px;
-      transform-origin: top left;
-      background: #0a0a12;
-      overflow: hidden;
-    }
-
-    #canvas::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-    }
-
-    /* Cursors live inside #canvas so they scale with it */
-    #my-cursor,
-    .remote-cursor {
-      position: absolute;
-      pointer-events: none;
-    }
-
-    #my-cursor {
-      z-index: 1000;
-    }
-    #my-cursor .ring {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid white;
-      position: absolute;
-      transform: translate(-50%, -50%);
-    }
-    #my-cursor .dot {
-      width: 6px;
-      height: 6px;
-      background: white;
-      border-radius: 50%;
-      position: absolute;
-      transform: translate(-50%, -50%);
-    }
-
-    .remote-cursor {
-      z-index: 999;
-      transform: translate(-8px, -8px);
-      transition: left 0.07s linear, top 0.07s linear;
-    }
-    .remote-cursor .glow {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      position: absolute;
-      transform: translate(-8px, -8px);
-      opacity: 0.25;
-      filter: blur(8px);
-    }
-    .remote-cursor .dot {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      position: absolute;
-    }
-    .remote-cursor .label {
-      position: absolute;
-      top: 20px;
-      left: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 20px;
-      white-space: nowrap;
-      color: #000;
-      letter-spacing: 0.3px;
-    }
-
-    /* HUD content */
-    .hud {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 28px;
-      color: #fff;
+      background: var(--bg);
+      color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
-    .title {
-      font-size: 3.6rem;
-      font-weight: 800;
-      text-align: center;
-      background: linear-gradient(135deg, #6366f1, #a78bfa, #f472b6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -1px;
-    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
 
-    .subtitle {
-      font-size: 0.95rem;
-      color: rgba(255,255,255,0.38);
-      text-align: center;
+    /* Nav */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(251,251,253,0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
     }
-
-    .panel {
-      display: flex;
-      gap: 16px;
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
     }
+    .logo { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 1.15rem; }
+    .logo .mark {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.92rem; }
+    .nav-links a:hover { color: var(--ink); }
+    .btn {
+      display: inline-block; border: none; cursor: pointer;
+      font: 600 0.9rem/1 inherit; padding: 11px 18px; border-radius: 10px;
+      text-decoration: none; transition: transform .1s, box-shadow .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #fff; box-shadow: 0 4px 14px rgba(99,102,241,.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(99,102,241,.4); }
+    .btn-ghost { background: #fff; color: var(--ink); border: 1px solid var(--line); }
 
+    /* Hero */
+    .hero { text-align: center; padding: 88px 0 64px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 99px; padding: 6px 14px; font-size: 0.82rem; color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .pill .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 6vw, 4rem); line-height: 1.08; font-weight: 850;
+      letter-spacing: -1.5px; max-width: 760px; margin: 0 auto 20px;
+    }
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero p {
+      font-size: 1.12rem; color: var(--muted); max-width: 540px; margin: 0 auto 32px;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* Mock app preview */
+    .preview {
+      margin: 56px auto 0; max-width: 920px;
+      background: #fff; border: 1px solid var(--line); border-radius: 16px;
+      box-shadow: 0 30px 60px -20px rgba(20,20,40,.18); overflow: hidden;
+    }
+    .preview-bar {
+      display: flex; align-items: center; gap: 7px; padding: 14px 16px;
+      border-bottom: 1px solid var(--line); background: #fafafc;
+    }
+    .preview-bar i { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+    .preview-body { display: grid; grid-template-columns: 200px 1fr; min-height: 280px; }
+    .preview-side { border-right: 1px solid var(--line); padding: 18px; }
+    .preview-side .row { height: 12px; border-radius: 6px; background: #eef0f5; margin-bottom: 12px; }
+    .preview-side .row.short { width: 60%; }
+    .preview-main { padding: 24px; }
+    .preview-main .block { border-radius: 10px; background: #f4f5fa; margin-bottom: 14px; }
+    .preview-main .block.h1 { height: 28px; width: 50%; }
+    .preview-main .block.h2 { height: 90px; }
+    .preview-main .block.h3 { height: 14px; }
+
+    /* Features */
+    section { padding: 72px 0; }
+    .section-head { text-align: center; margin-bottom: 48px; }
+    .section-head h2 { font-size: 2rem; letter-spacing: -.5px; margin-bottom: 10px; }
+    .section-head p { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     .card {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 14px;
-      padding: 18px 26px;
-      text-align: center;
+      background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 28px 24px;
+      transition: transform .15s, box-shadow .2s;
     }
-
-    .card-value {
-      font-size: 1.9rem;
-      font-weight: 700;
-      line-height: 1;
-      margin-bottom: 6px;
+    .card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px -12px rgba(20,20,40,.15); }
+    .card .icon {
+      width: 44px; height: 44px; border-radius: 12px; margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2)); opacity: .92;
     }
+    .card h3 { font-size: 1.1rem; margin-bottom: 8px; }
+    .card p { color: var(--muted); font-size: 0.94rem; }
 
-    .card-label {
-      font-size: 0.68rem;
-      color: rgba(255,255,255,0.38);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+    /* Pricing */
+    .pricing { background: #f6f6fa; }
+    .plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .plan {
+      background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 32px 26px; text-align: center;
     }
+    .plan.featured { border-color: var(--brand); box-shadow: 0 16px 40px -16px rgba(99,102,241,.4); }
+    .plan .name { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+    .plan .price { font-size: 2.6rem; font-weight: 800; margin: 12px 0 4px; }
+    .plan .price span { font-size: 0.95rem; font-weight: 500; color: var(--muted); }
+    .plan ul { list-style: none; margin: 22px 0; text-align: left; }
+    .plan li { padding: 8px 0; color: var(--muted); font-size: 0.92rem; border-bottom: 1px solid var(--line); }
+    .plan .btn { width: 100%; margin-top: 6px; }
 
-    .pos-value {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 1.1rem;
-      color: #a78bfa;
+    /* Footer */
+    footer { border-top: 1px solid var(--line); padding: 40px 0; color: var(--muted); font-size: 0.88rem; }
+    .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+
+    /* Presence pill */
+    .presence {
+      position: fixed; top: 76px; right: 20px; z-index: 200;
+      background: #fff; border: 1px solid var(--line); border-radius: 99px;
+      padding: 8px 14px; font-size: 0.82rem; color: var(--muted);
+      box-shadow: 0 8px 24px -8px rgba(20,20,40,.2); display: flex; align-items: center; gap: 8px;
     }
+    .presence .dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: blink 2s infinite; }
+    .presence b { color: var(--ink); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    .online-dot {
-      display: inline-block;
-      width: 9px;
-      height: 9px;
-      background: #22c55e;
-      border-radius: 50%;
-      margin-right: 6px;
-      animation: blink 2s infinite;
-      vertical-align: middle;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .share-btn {
-      cursor: none;
-      background: rgba(99,102,241,0.12);
-      border: 1px solid rgba(99,102,241,0.35);
-      color: rgba(255,255,255,0.6);
-      border-radius: 10px;
-      padding: 10px 20px;
-      font-size: 0.82rem;
-      font-family: inherit;
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-    }
-
-    .share-btn:hover {
-      background: rgba(99,102,241,0.22);
-      border-color: rgba(99,102,241,0.6);
-      color: #fff;
-    }
-
-    .share-btn .url {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      color: #818cf8;
-    }
-
-    .badge {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.2);
-      font-family: monospace;
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+      .grid, .plans { grid-template-columns: 1fr; }
+      .preview-body { grid-template-columns: 1fr; }
+      .preview-side { display: none; }
     }
   </style>
 </head>
 <body>
 
-<div id="canvas">
-  <div id="my-cursor">
-    <div class="ring"></div>
-    <div class="dot"></div>
-  </div>
-
-  <div class="hud">
-    <div>
-      <h1 class="title">Cursor Sharing</h1>
-      <p class="subtitle" style="margin-top:10px">URLを共有して、お互いのカーソルをリアルタイムで確認できます</p>
-    </div>
-
-    <div class="panel">
-      <div class="card">
-        <div class="card-value">
-          <span class="online-dot"></span><span id="user-count">—</span>
-        </div>
-        <div class="card-label">オンライン</div>
-      </div>
-      <div class="card">
-        <div class="card-value pos-value" id="my-pos">—</div>
-        <div class="card-label">あなたの座標</div>
-      </div>
-    </div>
-
-    <button class="share-btn" id="share-btn" onclick="copyUrl()">
-      URLをコピー: <span class="url" id="url-display"></span>
-    </button>
-  </div>
-
-  <div class="badge">Socket.io + Node.js</div>
+<div class="presence">
+  <span class="dot"></span><b id="cursor-presence-count">1</b> 人が閲覧中
 </div>
 
+<header>
+  <div class="wrap">
+    <nav>
+      <div class="logo"><span class="mark"></span>Halo</div>
+      <div class="nav-links">
+        <a href="#features">機能</a>
+        <a href="#pricing">料金</a>
+        <a href="#">ドキュメント</a>
+        <a href="#">会社情報</a>
+      </div>
+      <a href="#" class="btn btn-primary">無料で始める</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="pill"><span class="dot"></span>リアルタイム共同編集に対応しました</span>
+      <h1>チームの作業を、<span class="grad">同じ画面</span>で。</h1>
+      <p>Halo は、離れた場所にいるメンバーが同時に作業できる共同作業ツールです。お互いのカーソルがリアルタイムで見えます。</p>
+      <div class="hero-actions">
+        <a href="#" class="btn btn-primary">14日間 無料トライアル</a>
+        <a href="#features" class="btn btn-ghost">機能を見る</a>
+      </div>
+
+      <div class="preview">
+        <div class="preview-bar">
+          <i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i>
+        </div>
+        <div class="preview-body">
+          <div class="preview-side">
+            <div class="row"></div><div class="row short"></div>
+            <div class="row"></div><div class="row short"></div>
+            <div class="row"></div>
+          </div>
+          <div class="preview-main">
+            <div class="block h1"></div>
+            <div class="block h2"></div>
+            <div class="block h3"></div>
+            <div class="block h3" style="width:80%"></div>
+            <div class="block h3" style="width:65%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>すべてが、ひとつの場所に</h2>
+        <p>チームに必要な機能を、シンプルなインターフェースで。</p>
+      </div>
+      <div class="grid">
+        <div class="card">
+          <div class="icon"></div>
+          <h3>ライブカーソル</h3>
+          <p>メンバーがどこを見ているかリアルタイムで分かります。指差し確認がオンラインでも。</p>
+        </div>
+        <div class="card">
+          <div class="icon"></div>
+          <h3>同時編集</h3>
+          <p>複数人が同じドキュメントを同時に編集。変更は即座に全員へ反映されます。</p>
+        </div>
+        <div class="card">
+          <div class="icon"></div>
+          <h3>コメント＆通知</h3>
+          <p>気になる箇所にコメントを残し、メンションでメンバーに知らせましょう。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pricing" class="pricing">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>シンプルな料金プラン</h2>
+        <p>チームの規模に合わせて選べます。</p>
+      </div>
+      <div class="plans">
+        <div class="plan">
+          <div class="name">Starter</div>
+          <div class="price">¥0<span>/月</span></div>
+          <ul>
+            <li>3人まで</li>
+            <li>プロジェクト 2件</li>
+            <li>基本サポート</li>
+          </ul>
+          <a href="#" class="btn btn-ghost">始める</a>
+        </div>
+        <div class="plan featured">
+          <div class="name">Team</div>
+          <div class="price">¥1,200<span>/月</span></div>
+          <ul>
+            <li>無制限のメンバー</li>
+            <li>プロジェクト無制限</li>
+            <li>優先サポート</li>
+          </ul>
+          <a href="#" class="btn btn-primary">選択する</a>
+        </div>
+        <div class="plan">
+          <div class="name">Enterprise</div>
+          <div class="price">お問合せ</div>
+          <ul>
+            <li>SSO / SAML</li>
+            <li>専任担当者</li>
+            <li>SLA 保証</li>
+          </ul>
+          <a href="#" class="btn btn-ghost">相談する</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div class="logo"><span class="mark"></span>Halo</div>
+    <div>© 2026 Halo Inc. — リアルタイムカーソル共有デモ</div>
+  </div>
+</footer>
+
+<!-- Real-time cursor sharing: include socket.io + the drop-in client -->
 <script src="/socket.io/socket.io.js"></script>
-<script>
-  const CANVAS_W = 1440;
-  const CANVAS_H = 900;
-
-  const canvasEl  = document.getElementById('canvas');
-  const myCursorEl  = document.getElementById('my-cursor');
-  const myPosEl     = document.getElementById('my-pos');
-  const userCountEl = document.getElementById('user-count');
-  const urlDisplay  = document.getElementById('url-display');
-
-  // Scale canvas to fit viewport
-  let scale = 1;
-  function updateScale() {
-    scale = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H);
-    const offsetX = (window.innerWidth  - CANVAS_W * scale) / 2;
-    const offsetY = (window.innerHeight - CANVAS_H * scale) / 2;
-    canvasEl.style.transform = `scale(${scale})`;
-    canvasEl.style.left = offsetX + 'px';
-    canvasEl.style.top  = offsetY + 'px';
-  }
-  updateScale();
-  window.addEventListener('resize', updateScale);
-
-  // Identity
-  const COLORS = [
-    '#f43f5e','#f97316','#eab308','#22c55e',
-    '#06b6d4','#6366f1','#a855f7','#ec4899'
-  ];
-  const myColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const myName  = Math.random().toString(36).slice(2, 6).toUpperCase();
-
-  myCursorEl.querySelector('.ring').style.borderColor = myColor;
-  myCursorEl.querySelector('.dot').style.background   = myColor;
-
-  urlDisplay.textContent = window.location.href;
-
-  function copyUrl() {
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      const btn = document.getElementById('share-btn');
-      btn.innerHTML = '✓ コピーしました！';
-      setTimeout(() => {
-        btn.innerHTML = 'URLをコピー: <span class="url">' + window.location.href + '</span>';
-      }, 2000);
-    });
-  }
-
-  // Socket
-  const socket = io();
-  const remoteCursors = {};
-  let lastSent = 0;
-
-  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-
-  document.addEventListener('mousemove', (e) => {
-    // Convert viewport coords → canvas coords, clamped so the cursor never
-    // freezes in the letterbox margins around the scaled canvas.
-    const rect = canvasEl.getBoundingClientRect();
-    const cx = clamp((e.clientX - rect.left) / scale, 0, CANVAS_W);
-    const cy = clamp((e.clientY - rect.top)  / scale, 0, CANVAS_H);
-
-    myCursorEl.style.left = cx + 'px';
-    myCursorEl.style.top  = cy + 'px';
-    myPosEl.textContent   = `${Math.round(cx)}, ${Math.round(cy)}`;
-
-    const now = Date.now();
-    if (now - lastSent > 32) {
-      lastSent = now;
-      socket.emit('cursor', { x: cx, y: cy, color: myColor, name: myName });
-    }
-  });
-
-  document.addEventListener('mouseleave', () => socket.emit('cursor-leave'));
-
-  socket.on('cursor', ({ id, x, y, color, name }) => {
-    if (!remoteCursors[id]) {
-      const el = document.createElement('div');
-      el.className = 'remote-cursor';
-      el.innerHTML =
-        `<div class="glow" style="background:${color}"></div>` +
-        `<div class="dot" style="background:${color}"></div>` +
-        `<div class="label" style="background:${color}">${name}</div>`;
-      canvasEl.appendChild(el);
-      remoteCursors[id] = el;
-    }
-    // x, y are canvas coordinates — place directly
-    remoteCursors[id].style.left = x + 'px';
-    remoteCursors[id].style.top  = y + 'px';
-  });
-
-  function removeCursor(id) {
-    if (remoteCursors[id]) {
-      remoteCursors[id].remove();
-      delete remoteCursors[id];
-    }
-  }
-
-  socket.on('cursor-leave', ({ id }) => removeCursor(id));
-  socket.on('user-left',    ({ id }) => removeCursor(id));
-  socket.on('user-count',   (count) => { userCountEl.textContent = count; });
-</script>
+<script src="/cursors.js"></script>
 </body>
 </html>
