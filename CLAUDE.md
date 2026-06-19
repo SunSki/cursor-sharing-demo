@@ -5,6 +5,16 @@
 既存のWebサイトにリアルタイムカーソル共有を追加できるセルフホスト型パッケージ。  
 npm公開はせず、tarball形式で自分のプロジェクトに再利用する方針。
 
+## 使用サービス一覧
+
+| サービス | URL | 用途 |
+|---|---|---|
+| GitHub | https://github.com/SunSki/dotsync | ソースコード管理・自動デプロイトリガー |
+| Render | https://dashboard.render.com/ | リレーサーバーホスティング（無料プラン・スリープあり） |
+| Render サービス | https://dotsync-8an8.onrender.com | 本番リレーサーバー |
+| GitHub Pages | https://sunski.github.io/dotsync/privacy.html | プライバシーポリシーページ |
+| Chrome Web Store | https://chrome.google.com/webstore/devconsole | 拡張機能の申請・管理 |
+
 ## リポジトリ
 
 - GitHub: https://github.com/SunSki/dotsync（アカウント: SunSki）
