@@ -1,0 +1,11 @@
+{
+  "name": "@livecursors/client",
+  "version": "0.1.0",
+  "description": "Drop-in real-time cursor sharing for any website. One <script> tag.",
+  "main": "livecursors.js",
+  "browser": "livecursors.js",
+  "unpkg": "livecursors.js",
+  "files": ["livecursors.js", "README.md"],
+  "keywords": ["cursor", "presence", "realtime", "collaboration", "multiplayer"],
+  "license": "MIT"
+}

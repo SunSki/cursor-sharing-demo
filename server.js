@@ -1,36 +1,24 @@
+// Demo site for @livecursors. Shows how a site owner self-hosts the relay:
+// attach it to an existing Express/HTTP server in a couple of lines.
 const express = require('express');
 const { createServer } = require('http');
-const { Server } = require('socket.io');
 const path = require('path');
+const { attachCursors } = require('@livecursors/server');
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-let userCount = 0;
-
-io.on('connection', (socket) => {
-  userCount++;
-  io.emit('user-count', userCount);
-
-  socket.on('cursor', (data) => {
-    socket.broadcast.emit('cursor', { ...data, id: socket.id });
-  });
-
-  socket.on('cursor-leave', () => {
-    socket.broadcast.emit('cursor-leave', { id: socket.id });
-  });
-
-  socket.on('disconnect', () => {
-    userCount--;
-    io.emit('user-left', { id: socket.id });
-    io.emit('user-count', userCount);
-  });
+// Serve the browser client straight from the package so the demo's
+// <script src="/livecursors.js"> stays in sync with what we'd publish.
+app.get('/livecursors.js', (req, res) => {
+  res.type('application/javascript');
+  res.sendFile(require.resolve('@livecursors/client'));
 });
+
+// The one integration line: real-time cursor relay on /livecursors.
+attachCursors(httpServer, { path: '/livecursors' });
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`);
-});
+httpServer.listen(PORT, () => console.log(`http://localhost:${PORT}`));

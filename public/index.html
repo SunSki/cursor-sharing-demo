@@ -157,7 +157,7 @@
 <body>
 
 <div class="presence">
-  <span class="dot"></span><b id="cursor-presence-count">1</b> 人が閲覧中
+  <span class="dot"></span><b data-livecursors-count>1</b> 人が閲覧中
 </div>
 
 <header>
@@ -283,8 +283,7 @@
   </div>
 </footer>
 
-<!-- Real-time cursor sharing: include socket.io + the drop-in client -->
-<script src="/socket.io/socket.io.js"></script>
-<script src="/cursors.js"></script>
+<!-- Real-time cursor sharing — one line. data-server="" => same origin. -->
+<script src="/livecursors.js" data-server="" data-room="auto" data-path="/livecursors"></script>
 </body>
 </html>

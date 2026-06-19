@@ -1,12 +1,17 @@
 {
-  "name": "cursor-sharing-demo",
-  "version": "1.0.0",
+  "name": "livecursors",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Real-time cursor sharing — monorepo: @livecursors/client + @livecursors/server, plus a demo site.",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "socket.io": "^4.7.5"
+    "@livecursors/server": "*",
+    "express": "^4.19.2"
   },
   "engines": {
     "node": ">=18"
