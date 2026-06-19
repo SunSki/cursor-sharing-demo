@@ -95,7 +95,8 @@
 
     var name  = opts.name  || 'User-' + Math.random().toString(36).slice(2, 6).toUpperCase();
     var color = opts.color || COLORS[Math.floor(Math.random() * COLORS.length)];
-    var throttleMs = opts.throttleMs != null ? opts.throttleMs : 32;
+    var throttleMs = opts.throttleMs != null ? opts.throttleMs : 50;
+    var idleMs = opts.idleMs != null ? opts.idleMs : 5000;
     var zIndex = opts.zIndex != null ? opts.zIndex : 2147483646;
     var socketUrl = opts.socketUrl || DEFAULT_SOCKETIO;
     var onPresence = typeof opts.onPresence === 'function' ? opts.onPresence : null;
@@ -176,23 +177,49 @@
     var last = 0;
     var destroyed = false;
 
+    // Load-reduction state.
+    var peers = 0;            // others in the room (from presence events)
+    var hidden = false;       // tab currently in the background
+    var idle = false;         // no mouse movement for idleMs
+    var idleTimer = null;
+    var shown = false;        // peers currently render our cursor
+    var r3 = function (v) { return Math.round(v * 1000) / 1000; };
+
+    function emitLeave() {
+      if (socket && shown) { socket.emit('cursor-leave'); shown = false; }
+    }
+
     function onMove(e) {
+      // Reset idle state on any movement.
+      idle = false;
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(function () { idle = true; emitLeave(); }, idleMs);
+
+      // Skip sending entirely when alone, hidden, or throttled.
+      if (peers < 2 || hidden) return;
       var now = Date.now();
       if (now - last < throttleMs) return;
       last = now;
+
       var target = document.elementFromPoint(e.clientX, e.clientY);
       if (!target) return;
       var path = cssPath(target);
       if (!path) return;
       var rect = target.getBoundingClientRect();
+      // Short keys + rounded ratios to keep the payload small.
       socket.emit('cursor', {
-        path: path,
-        rx: rect.width  ? (e.clientX - rect.left) / rect.width  : 0,
-        ry: rect.height ? (e.clientY - rect.top)  / rect.height : 0,
-        name: name, color: color
+        p: path,
+        x: rect.width  ? r3((e.clientX - rect.left) / rect.width)  : 0,
+        y: rect.height ? r3((e.clientY - rect.top)  / rect.height) : 0,
+        n: name, c: color
       });
+      shown = true;
     }
-    function onLeave() { if (socket) socket.emit('cursor-leave'); }
+    function onLeave() { emitLeave(); }
+    function onVisibility() {
+      hidden = document.hidden;
+      if (hidden) emitLeave();
+    }
 
     function remove(id) {
       if (remotes[id]) { remotes[id].el.remove(); delete remotes[id]; }
@@ -206,33 +233,36 @@
 
       socket.on('cursor', function (d) {
         var r = remotes[d.id];
-        if (!r) { r = { el: makeCursorEl(d.color, d.name) }; layer.appendChild(r.el); remotes[d.id] = r; }
-        r.path = d.path; r.rx = d.rx; r.ry = d.ry;
+        if (!r) { r = { el: makeCursorEl(d.c, d.n) }; layer.appendChild(r.el); remotes[d.id] = r; }
+        r.path = d.p; r.rx = d.x; r.ry = d.y;
         place(r);
       });
       socket.on('cursor-leave', function (d) { remove(d.id); });
 
       socket.on('presence', function (p) {
-        var n = p && p.count != null ? p.count : 0;
+        peers = p && p.count != null ? p.count : 0;
         var nodes = document.querySelectorAll('[data-livecursors-count]');
-        for (var i = 0; i < nodes.length; i++) nodes[i].textContent = n;
-        if (onPresence) onPresence(n);
+        for (var i = 0; i < nodes.length; i++) nodes[i].textContent = peers;
+        if (onPresence) onPresence(peers);
       });
 
       window.addEventListener('mousemove', onMove);
       window.addEventListener('mouseleave', onLeave);
       window.addEventListener('scroll', repositionAll, true);
       window.addEventListener('resize', repositionAll);
+      document.addEventListener('visibilitychange', onVisibility);
     }).catch(function (err) { console.error(err); });
 
     return {
       room: room,
       destroy: function () {
         destroyed = true;
+        clearTimeout(idleTimer);
         window.removeEventListener('mousemove', onMove);
         window.removeEventListener('mouseleave', onLeave);
         window.removeEventListener('scroll', repositionAll, true);
         window.removeEventListener('resize', repositionAll);
+        document.removeEventListener('visibilitychange', onVisibility);
         if (socket) socket.disconnect();
         layer.remove();
       }

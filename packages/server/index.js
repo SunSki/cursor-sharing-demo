@@ -28,6 +28,8 @@ function attachCursors(httpServer, options = {}) {
     path,
     serveClient: false,
     cors: options.cors,
+    // Tiny, frequent cursor frames: compression costs more CPU than it saves.
+    perMessageDeflate: false,
     ...(options.io || {}),
   });
 

@@ -3,21 +3,19 @@
  *
  * Loaded after lib/socket.io.min.js and lib/livecursors.js (same isolated
  * world), so `window.io` and `window.LiveCursors` are already available here.
- * We connect to the hosted relay with the room scoped to the current page URL,
- * so anyone else running this extension on the same URL sees each other.
+ *
+ * Privacy model: cursor sharing only runs when the user has set a ROOM CODE
+ * in the popup. The room is `origin + pathname + ":" + code`, so only people
+ * with the same code on the same URL see each other. Empty code = OFF.
  */
 (function () {
   'use strict';
 
-  var RELAY  = 'https://cursor-sharing-demo.onrender.com';
+  var RELAY = 'https://cursor-sharing-demo.onrender.com';
   var SIO_PATH = '/livecursors';
 
-  // Only run on real web pages.
   if (!/^https?:$/.test(location.protocol)) return;
   if (!window.LiveCursors || !window.io) return;
-
-  // Room = origin + pathname (ignore query/hash so trackers don't split rooms).
-  var room = location.origin + location.pathname;
 
   var session = null;
   var badge = null;
@@ -32,16 +30,16 @@
       'opacity:0', 'transition:opacity .3s'
     ].join(';');
     el.innerHTML =
-      '<span style="width:8px;height:8px;border-radius:50%;background:#4ade80;' +
-        'box-shadow:0 0 0 0 rgba(74,222,128,.6);"></span>' +
+      '<span style="width:8px;height:8px;border-radius:50%;background:#4ade80;"></span>' +
       '<span>LiveCursors <b data-livecursors-count>1</b></span>';
     document.body.appendChild(el);
     requestAnimationFrame(function () { el.style.opacity = '1'; });
     return el;
   }
 
-  function start(name, color) {
-    if (session) return;
+  function start(code, name, color) {
+    if (session || !code) return;
+    var room = location.origin + location.pathname + ':' + code;
     badge = makeBadge();
     session = window.LiveCursors.init({
       server: RELAY,
@@ -61,22 +59,23 @@
     if (badge) { badge.remove(); badge = null; }
   }
 
-  // Read settings, then start if enabled (default: on).
-  chrome.storage.sync.get(['enabled', 'userName', 'userColor'], function (cfg) {
-    var enabled = cfg.enabled !== false; // default true
-    if (enabled) start(cfg.userName, cfg.userColor);
+  function restart(code, name, color) { stop(); start(code, name, color); }
+
+  // Start only if a room code is set.
+  chrome.storage.sync.get(['roomCode', 'userName', 'userColor'], function (cfg) {
+    var code = (cfg.roomCode || '').trim();
+    if (code) start(code, cfg.userName, cfg.userColor);
   });
 
-  // React to popup toggles live, without a page reload.
+  // React to popup changes live (no page reload needed).
   chrome.storage.onChanged.addListener(function (changes, area) {
     if (area !== 'sync') return;
-    if (changes.enabled) {
-      if (changes.enabled.newValue === false) stop();
-      else {
-        chrome.storage.sync.get(['userName', 'userColor'], function (cfg) {
-          start(cfg.userName, cfg.userColor);
-        });
-      }
+    if (changes.roomCode || changes.userName || changes.userColor) {
+      chrome.storage.sync.get(['roomCode', 'userName', 'userColor'], function (cfg) {
+        var code = (cfg.roomCode || '').trim();
+        if (code) restart(code, cfg.userName, cfg.userColor);
+        else stop();
+      });
     }
   });
 })();
