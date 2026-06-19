@@ -24,5 +24,5 @@ reflow, and scroll. Add `data-lc-id="..."` to key elements for stable anchoring
 on dynamic/SPA pages. A `[data-livecursors-count]` element is auto-filled with
 the live viewer count.
 
-See the [config table](https://github.com/SunSki/cursor-sharing-demo#options)
+See the [config table](https://github.com/SunSki/dotsync#options)
 for all `data-*` / `init()` options.
