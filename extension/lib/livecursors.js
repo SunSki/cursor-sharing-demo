@@ -112,7 +112,11 @@
       var el = document.createElement('div');
       el.style.cssText = 'position:absolute;left:0;top:0;will-change:transform;' +
         'transition:transform .08s linear;display:none;';
-      el.innerHTML =
+
+      // On-screen pointer: arrow + name label.
+      var pointer = document.createElement('div');
+      pointer.style.cssText = 'position:absolute;left:0;top:0;';
+      pointer.innerHTML =
         '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" ' +
           'style="filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">' +
           '<path d="M5 3l5.5 14 2-5.5L18 9.5 5 3z" fill="' + c + '" ' +
@@ -120,6 +124,22 @@
         '<span style="position:absolute;left:18px;top:18px;background:' + c +
           ';color:#fff;font:600 11px/1 -apple-system,sans-serif;padding:3px 7px;' +
           'border-radius:10px;white-space:nowrap;">' + n + '</span>';
+
+      // Off-screen edge marker: chevron (▲/▼) + name, pinned to top/bottom edge.
+      var edge = document.createElement('div');
+      edge.style.cssText = 'position:absolute;left:0;top:0;display:none;' +
+        'align-items:center;gap:5px;background:' + c + ';color:#fff;' +
+        'font:600 11px/1 -apple-system,sans-serif;padding:5px 10px;' +
+        'border-radius:99px;white-space:nowrap;transform:translate(-50%,0);' +
+        'box-shadow:0 2px 8px rgba(0,0,0,.35);';
+      edge.innerHTML = '<span data-chev style="font-size:9px;"></span>' +
+        '<span>' + n + '</span>';
+
+      el.appendChild(pointer);
+      el.appendChild(edge);
+      el._pointer = pointer;
+      el._edge = edge;
+      el._chev = edge.querySelector('[data-chev]');
       return el;
     }
 
@@ -129,8 +149,25 @@
       var rect = el.getBoundingClientRect();
       var x = rect.left + r.rx * rect.width;
       var y = rect.top  + r.ry * rect.height;
-      r.el.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      var W = window.innerWidth, H = window.innerHeight, M = 10;
+
       r.el.style.display = 'block';
+
+      if (y < 0 || y > H) {
+        // Remote pointer scrolled out of view vertically: show a direction
+        // marker clamped to the nearest edge so they're never lost.
+        var top = y < 0;
+        var cx = Math.max(M + 30, Math.min(W - M - 30, x));
+        var cy = top ? M : H - M - 24;
+        r.el._pointer.style.display = 'none';
+        r.el._edge.style.display = 'inline-flex';
+        r.el._chev.textContent = top ? '▲' : '▼';
+        r.el.style.transform = 'translate(' + cx + 'px,' + cy + 'px)';
+      } else {
+        r.el._pointer.style.display = 'block';
+        r.el._edge.style.display = 'none';
+        r.el.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+      }
     }
 
     function repositionAll() { for (var id in remotes) place(remotes[id]); }
