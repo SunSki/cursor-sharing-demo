@@ -13,8 +13,8 @@ Render に常時稼働しているリレーサーバーを使います。
 
 ```html
 <!-- </body> の直前に追加するだけ -->
-<script src="https://dotsync.onrender.com/livecursors.js"
-        data-server="https://dotsync.onrender.com"
+<script src="https://dotsync-8an8.onrender.com/livecursors.js"
+        data-server="https://dotsync-8an8.onrender.com"
         data-room="auto"
         data-path="/livecursors"></script>
 ```

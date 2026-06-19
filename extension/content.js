@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var RELAY = 'https://dotsync.onrender.com';
+  var RELAY = 'https://dotsync-8an8.onrender.com';
   var SIO_PATH = '/livecursors';
 
   if (!/^https?:$/.test(location.protocol)) return;

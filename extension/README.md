@@ -10,7 +10,7 @@
 - ルームは `origin + pathname + ":" + ルームコード`。**同じコード × 同じURL** の
   人だけが同じルームに入ります。
 - カーソルは Render 上のリレーサーバー
-  (`https://dotsync.onrender.com`) 経由で中継されます。
+  (`https://dotsync-8an8.onrender.com`) 経由で中継されます。
 - カーソル位置は「どのDOM要素の中の相対位置か」で送るので、画面サイズが
   違っても同じ要素を指せます。
 
