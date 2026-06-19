@@ -1,102 +1,92 @@
 # LiveCursors
 
-Real-time cursor sharing you can add to an existing website. Self-hosted, two
-small packages, no SaaS.
+リアルタイムカーソル共有を既存のWebサイトに追加できるパッケージです。
 
-- **`@livecursors/server`** — attach a relay to your existing Node HTTP server.
-- **`@livecursors/client`** — one `<script>` tag in your pages.
+- **`@livecursors/server`** — 既存の Node HTTP サーバーにリレーを追加
+- **`@livecursors/client`** — `<script>` 1行でどのページにも組み込める
 
-Cursors are shared as *which element + relative position inside it*, so they
-stay accurate across different screen sizes, responsive reflow, and scroll
-position. Cursor traffic is scoped per room (one room per page URL by default),
-so different pages and sites stay isolated.
+カーソル位置は「どのDOM要素の、その中の相対位置か」で送受信するため、  
+画面サイズやレイアウトが異なっても同じオブジェクトを正確に指し示せます。  
+ページURL単位でルームが自動分離されるので、サイトをまたいで混線しません。
 
-## Add it to your site
+---
 
-**1. Server** — in your existing app (anything with a Node `http.Server`):
+## 使い方
 
-```js
-const { createServer } = require('http');
-const { attachCursors } = require('@livecursors/server');
+### 方法A　`<script>` 1行だけ（最も簡単）
 
-const httpServer = createServer(app);          // your Express/Koa/etc. app
-attachCursors(httpServer, { path: '/livecursors' });
-httpServer.listen(3000);
-```
-
-**2. Client** — one line in the pages you want shared:
+Node.js 不要。`index.html` だけのサイトにも追加できます。
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@livecursors/client"
-        data-server="https://your-app.com"
+<script src="https://cursor-sharing-demo.onrender.com/livecursors.js"
+        data-server="https://cursor-sharing-demo.onrender.com"
         data-room="auto"
         data-path="/livecursors"></script>
 ```
 
-`data-server=""` means "same origin". `data-room="auto"` scopes the room to the
-current page URL. That's it.
+Render 上のリレーサーバーを使います。ファイルのコピーも npm も不要です。
 
-### Options
+### 方法B　自分のサーバーに組み込む
 
-Client (`data-*` attributes, or `init({...})` if you `import` it):
+既存の Node.js サーバーにリレーを立てる場合。
 
-| attribute      | default        | meaning                                   |
-|----------------|----------------|-------------------------------------------|
-| `data-server`  | same origin    | origin of your relay server               |
-| `data-path`    | `/livecursors` | must match the server's `path`            |
-| `data-room`    | `auto`         | `auto` = per-page; or any string          |
-| `data-name`    | random         | label shown on your cursor                |
-| `data-color`   | random         | cursor color                              |
-| `data-throttle`| `32`           | min ms between sent updates               |
+**サーバー側:**
+```js
+const { attachCursors } = require('@livecursors/server');
+attachCursors(httpServer, { path: '/livecursors' });
+```
 
-Add `data-lc-id="checkout-button"` to important elements for rock-solid
-anchoring on dynamic / SPA pages (preferred over the structural fallback).
-Put a presence counter anywhere with `<span data-livecursors-count></span>`.
+**ページ側:**
+```html
+<script src="/livecursors.js"
+        data-server=""
+        data-room="auto"
+        data-path="/livecursors"></script>
+```
 
-## This repo
+詳細な手順は [INSTALL.md](./INSTALL.md) を参照してください。
 
-A workspaces monorepo. The root is a runnable demo site (a fake landing page)
-that self-hosts the relay exactly as above:
+---
+
+## このリポジトリ
+
+npm workspaces のモノレポです。ルートはデモサイト（ランディングページ風）で、  
+両パッケージを実際に使って動かせます。
 
 ```bash
 npm install
-npm start        # http://localhost:3000 — open in two windows
+npm start   # http://localhost:3000 を複数ウィンドウで開くと動作確認できる
 ```
 
 ```
-packages/server   @livecursors/server  (attachCursors)
-packages/client   @livecursors/client  (livecursors.js)
-server.js         demo: Express + attachCursors
-public/index.html demo page using the client
+packages/server          @livecursors/server のソース（attachCursors）
+packages/client          @livecursors/client のソース（livecursors.js）
+server.js                デモ: Express + attachCursors
+public/index.html        デモページ
+test-site/               tarball からインストールした動作確認済み実装例
+  ├─ TEST_LOG.md           インストール手順の確認ログ
+  ├─ server.js             方法B のサンプル
+  ├─ public/index.html     方法B のサンプルページ
+  └─ frontend-only/        方法A のサンプル（<script>1行のみ）
+      └─ index.html
 ```
 
-## Reuse it in your own projects (without publishing)
-
-Build local tarballs and install them like any npm package — no registry:
+## 自分のプロジェクトで再利用する（npm 公開なし）
 
 ```bash
-npm run pack          # writes dist/livecursors-{server,client}-0.1.0.tgz
+npm run pack
+# → dist/livecursors-{server,client}-0.1.0.tgz を生成
 ```
 
-Then in another project:
-
+別プロジェクトで:
 ```bash
 npm install /path/to/cursor-sharing-demo/dist/livecursors-server-0.1.0.tgz \
             /path/to/cursor-sharing-demo/dist/livecursors-client-0.1.0.tgz
 ```
 
-`require('@livecursors/server')` / `import '@livecursors/client'` then work
-exactly as if installed from npm (socket.io is pulled in automatically).
-
-Other options for self-reuse:
-- **Local path dep** (same machine, auto-updates): add to package.json →
-  `"@livecursors/server": "file:../cursor-sharing-demo/packages/server"`.
-- **Just copy the file**: `packages/client/livecursors.js` is a standalone UMD —
-  drop it into any site's static folder and point `data-server` at a relay.
+`require('@livecursors/server')` が npm 経由と同じように使えます。
 
 ## Notes
 
-- The client auto-loads the socket.io browser library from a CDN; override with
-  `data-socketio="..."` to self-host that too.
-- Same-DOM assumption: clients on the same room should render the same markup
-  (same URL/build). For pages that differ, anchor with `data-lc-id`.
+- クライアントは socket.io をCDNから自動ロードします。`data-socketio="..."` でURLを上書き可能。
+- 同じルームのクライアントは同一のHTMLを表示している前提です。DOM構造が動的に変わる場合は `data-lc-id` でアンカー要素を明示してください。
