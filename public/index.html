@@ -8,18 +8,27 @@
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #0a0a12;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-      min-height: 100vh;
+      background: #060610;
       overflow: hidden;
       cursor: none;
       user-select: none;
+      width: 100vw;
+      height: 100vh;
     }
 
-    body::before {
+    /* Fixed-size canvas — CSS transform scales it to fit any screen */
+    #canvas {
+      position: absolute;
+      width: 1440px;
+      height: 900px;
+      transform-origin: top left;
+      background: #0a0a12;
+      overflow: hidden;
+    }
+
+    #canvas::before {
       content: '';
-      position: fixed;
+      position: absolute;
       inset: 0;
       background-image:
         linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
@@ -28,9 +37,14 @@
       pointer-events: none;
     }
 
-    #my-cursor {
-      position: fixed;
+    /* Cursors live inside #canvas so they scale with it */
+    #my-cursor,
+    .remote-cursor {
+      position: absolute;
       pointer-events: none;
+    }
+
+    #my-cursor {
       z-index: 1000;
     }
     #my-cursor .ring {
@@ -51,8 +65,6 @@
     }
 
     .remote-cursor {
-      position: fixed;
-      pointer-events: none;
       z-index: 999;
       transform: translate(-8px, -8px);
       transition: left 0.07s linear, top 0.07s linear;
@@ -85,19 +97,21 @@
       letter-spacing: 0.3px;
     }
 
+    /* HUD content */
     .hud {
-      position: fixed;
+      position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 28px;
-      pointer-events: none;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
     }
 
     .title {
-      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-size: 3.6rem;
       font-weight: 800;
       text-align: center;
       background: linear-gradient(135deg, #6366f1, #a78bfa, #f472b6);
@@ -163,7 +177,6 @@
     }
 
     .share-btn {
-      pointer-events: all;
       cursor: none;
       background: rgba(99,102,241,0.12);
       border: 1px solid rgba(99,102,241,0.35);
@@ -187,61 +200,81 @@
     }
 
     .badge {
-      position: fixed;
+      position: absolute;
       bottom: 20px;
       right: 20px;
       font-size: 0.7rem;
       color: rgba(255,255,255,0.2);
+      font-family: monospace;
     }
   </style>
 </head>
 <body>
 
-<div id="my-cursor">
-  <div class="ring"></div>
-  <div class="dot"></div>
-</div>
-
-<div class="hud">
-  <div>
-    <h1 class="title">Cursor Sharing</h1>
-    <p class="subtitle" style="margin-top:10px">URLを共有して、お互いのカーソルをリアルタイムで確認できます</p>
+<div id="canvas">
+  <div id="my-cursor">
+    <div class="ring"></div>
+    <div class="dot"></div>
   </div>
 
-  <div class="panel">
-    <div class="card">
-      <div class="card-value">
-        <span class="online-dot"></span><span id="user-count">—</span>
+  <div class="hud">
+    <div>
+      <h1 class="title">Cursor Sharing</h1>
+      <p class="subtitle" style="margin-top:10px">URLを共有して、お互いのカーソルをリアルタイムで確認できます</p>
+    </div>
+
+    <div class="panel">
+      <div class="card">
+        <div class="card-value">
+          <span class="online-dot"></span><span id="user-count">—</span>
+        </div>
+        <div class="card-label">オンライン</div>
       </div>
-      <div class="card-label">オンライン</div>
+      <div class="card">
+        <div class="card-value pos-value" id="my-pos">—</div>
+        <div class="card-label">あなたの座標</div>
+      </div>
     </div>
-    <div class="card">
-      <div class="card-value pos-value" id="my-pos">—</div>
-      <div class="card-label">あなたの座標</div>
-    </div>
+
+    <button class="share-btn" id="share-btn" onclick="copyUrl()">
+      URLをコピー: <span class="url" id="url-display"></span>
+    </button>
   </div>
 
-  <button class="share-btn" id="share-btn" onclick="copyUrl()">
-    URLをコピー: <span class="url" id="url-display"></span>
-  </button>
+  <div class="badge">Socket.io + Node.js</div>
 </div>
-
-<div class="badge">Socket.io + Node.js</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const COLORS = [
-    '#f43f5e','#f97316','#eab308','#22c55e',
-    '#06b6d4','#6366f1','#a855f7','#ec4899'
-  ];
+  const CANVAS_W = 1440;
+  const CANVAS_H = 900;
 
-  const myColor = COLORS[Math.floor(Math.random() * COLORS.length)];
-  const myName  = Math.random().toString(36).slice(2, 6).toUpperCase();
-
+  const canvasEl  = document.getElementById('canvas');
   const myCursorEl  = document.getElementById('my-cursor');
   const myPosEl     = document.getElementById('my-pos');
   const userCountEl = document.getElementById('user-count');
   const urlDisplay  = document.getElementById('url-display');
+
+  // Scale canvas to fit viewport
+  let scale = 1;
+  function updateScale() {
+    scale = Math.min(window.innerWidth / CANVAS_W, window.innerHeight / CANVAS_H);
+    const offsetX = (window.innerWidth  - CANVAS_W * scale) / 2;
+    const offsetY = (window.innerHeight - CANVAS_H * scale) / 2;
+    canvasEl.style.transform = `scale(${scale})`;
+    canvasEl.style.left = offsetX + 'px';
+    canvasEl.style.top  = offsetY + 'px';
+  }
+  updateScale();
+  window.addEventListener('resize', updateScale);
+
+  // Identity
+  const COLORS = [
+    '#f43f5e','#f97316','#eab308','#22c55e',
+    '#06b6d4','#6366f1','#a855f7','#ec4899'
+  ];
+  const myColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const myName  = Math.random().toString(36).slice(2, 6).toUpperCase();
 
   myCursorEl.querySelector('.ring').style.borderColor = myColor;
   myCursorEl.querySelector('.dot').style.background   = myColor;
@@ -258,26 +291,28 @@
     });
   }
 
+  // Socket
   const socket = io();
   const remoteCursors = {};
   let lastSent = 0;
 
   document.addEventListener('mousemove', (e) => {
-    const x = e.clientX, y = e.clientY;
+    // Convert viewport coords → canvas coords
+    const rect = canvasEl.getBoundingClientRect();
+    const cx = (e.clientX - rect.left) / scale;
+    const cy = (e.clientY - rect.top)  / scale;
 
-    myCursorEl.style.left = x + 'px';
-    myCursorEl.style.top  = y + 'px';
-    myPosEl.textContent   = `${x}, ${y}`;
+    // Ignore if outside canvas
+    if (cx < 0 || cx > CANVAS_W || cy < 0 || cy > CANVAS_H) return;
+
+    myCursorEl.style.left = cx + 'px';
+    myCursorEl.style.top  = cy + 'px';
+    myPosEl.textContent   = `${Math.round(cx)}, ${Math.round(cy)}`;
 
     const now = Date.now();
     if (now - lastSent > 32) {
       lastSent = now;
-      socket.emit('cursor', {
-        x: x / window.innerWidth,
-        y: y / window.innerHeight,
-        color: myColor,
-        name: myName
-      });
+      socket.emit('cursor', { x: cx, y: cy, color: myColor, name: myName });
     }
   });
 
@@ -291,12 +326,12 @@
         `<div class="glow" style="background:${color}"></div>` +
         `<div class="dot" style="background:${color}"></div>` +
         `<div class="label" style="background:${color}">${name}</div>`;
-      document.body.appendChild(el);
+      canvasEl.appendChild(el);
       remoteCursors[id] = el;
     }
-    const el = remoteCursors[id];
-    el.style.left = (x * window.innerWidth)  + 'px';
-    el.style.top  = (y * window.innerHeight) + 'px';
+    // x, y are canvas coordinates — place directly
+    remoteCursors[id].style.left = x + 'px';
+    remoteCursors[id].style.top  = y + 'px';
   });
 
   function removeCursor(id) {
@@ -308,10 +343,7 @@
 
   socket.on('cursor-leave', ({ id }) => removeCursor(id));
   socket.on('user-left',    ({ id }) => removeCursor(id));
-
-  socket.on('user-count', (count) => {
-    userCountEl.textContent = count;
-  });
+  socket.on('user-count',   (count) => { userCountEl.textContent = count; });
 </script>
 </body>
 </html>
