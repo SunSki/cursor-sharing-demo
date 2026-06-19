@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cursor Sharing — リアルタイムカーソル共有</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a12;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      cursor: none;
+      user-select: none;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+    }
+
+    #my-cursor {
+      position: fixed;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    #my-cursor .ring {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid white;
+      position: absolute;
+      transform: translate(-50%, -50%);
+    }
+    #my-cursor .dot {
+      width: 6px;
+      height: 6px;
+      background: white;
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+    }
+
+    .remote-cursor {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-8px, -8px);
+      transition: left 0.07s linear, top 0.07s linear;
+    }
+    .remote-cursor .glow {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-8px, -8px);
+      opacity: 0.25;
+      filter: blur(8px);
+    }
+    .remote-cursor .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .remote-cursor .label {
+      position: absolute;
+      top: 20px;
+      left: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      color: #000;
+      letter-spacing: 0.3px;
+    }
+
+    .hud {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 28px;
+      pointer-events: none;
+    }
+
+    .title {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      text-align: center;
+      background: linear-gradient(135deg, #6366f1, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.38);
+      text-align: center;
+    }
+
+    .panel {
+      display: flex;
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      padding: 18px 26px;
+      text-align: center;
+    }
+
+    .card-value {
+      font-size: 1.9rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .card-label {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.38);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .pos-value {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 1.1rem;
+      color: #a78bfa;
+    }
+
+    .online-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      background: #22c55e;
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: blink 2s infinite;
+      vertical-align: middle;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .share-btn {
+      pointer-events: all;
+      cursor: none;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.35);
+      color: rgba(255,255,255,0.6);
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .share-btn:hover {
+      background: rgba(99,102,241,0.22);
+      border-color: rgba(99,102,241,0.6);
+      color: #fff;
+    }
+
+    .share-btn .url {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      color: #818cf8;
+    }
+
+    .badge {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div id="my-cursor">
+  <div class="ring"></div>
+  <div class="dot"></div>
+</div>
+
+<div class="hud">
+  <div>
+    <h1 class="title">Cursor Sharing</h1>
+    <p class="subtitle" style="margin-top:10px">URLを共有して、お互いのカーソルをリアルタイムで確認できます</p>
+  </div>
+
+  <div class="panel">
+    <div class="card">
+      <div class="card-value">
+        <span class="online-dot"></span><span id="user-count">—</span>
+      </div>
+      <div class="card-label">オンライン</div>
+    </div>
+    <div class="card">
+      <div class="card-value pos-value" id="my-pos">—</div>
+      <div class="card-label">あなたの座標</div>
+    </div>
+  </div>
+
+  <button class="share-btn" id="share-btn" onclick="copyUrl()">
+    URLをコピー: <span class="url" id="url-display"></span>
+  </button>
+</div>
+
+<div class="badge">Socket.io + Node.js</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const COLORS = [
+    '#f43f5e','#f97316','#eab308','#22c55e',
+    '#06b6d4','#6366f1','#a855f7','#ec4899'
+  ];
+
+  const myColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+  const myName  = Math.random().toString(36).slice(2, 6).toUpperCase();
+
+  const myCursorEl  = document.getElementById('my-cursor');
+  const myPosEl     = document.getElementById('my-pos');
+  const userCountEl = document.getElementById('user-count');
+  const urlDisplay  = document.getElementById('url-display');
+
+  myCursorEl.querySelector('.ring').style.borderColor = myColor;
+  myCursorEl.querySelector('.dot').style.background   = myColor;
+
+  urlDisplay.textContent = window.location.href;
+
+  function copyUrl() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = document.getElementById('share-btn');
+      btn.innerHTML = '✓ コピーしました！';
+      setTimeout(() => {
+        btn.innerHTML = 'URLをコピー: <span class="url">' + window.location.href + '</span>';
+      }, 2000);
+    });
+  }
+
+  const socket = io();
+  const remoteCursors = {};
+  let lastSent = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    const x = e.clientX, y = e.clientY;
+
+    myCursorEl.style.left = x + 'px';
+    myCursorEl.style.top  = y + 'px';
+    myPosEl.textContent   = `${x}, ${y}`;
+
+    const now = Date.now();
+    if (now - lastSent > 32) {
+      lastSent = now;
+      socket.emit('cursor', {
+        x: x / window.innerWidth,
+        y: y / window.innerHeight,
+        color: myColor,
+        name: myName
+      });
+    }
+  });
+
+  document.addEventListener('mouseleave', () => socket.emit('cursor-leave'));
+
+  socket.on('cursor', ({ id, x, y, color, name }) => {
+    if (!remoteCursors[id]) {
+      const el = document.createElement('div');
+      el.className = 'remote-cursor';
+      el.innerHTML =
+        `<div class="glow" style="background:${color}"></div>` +
+        `<div class="dot" style="background:${color}"></div>` +
+        `<div class="label" style="background:${color}">${name}</div>`;
+      document.body.appendChild(el);
+      remoteCursors[id] = el;
+    }
+    const el = remoteCursors[id];
+    el.style.left = (x * window.innerWidth)  + 'px';
+    el.style.top  = (y * window.innerHeight) + 'px';
+  });
+
+  function removeCursor(id) {
+    if (remoteCursors[id]) {
+      remoteCursors[id].remove();
+      delete remoteCursors[id];
+    }
+  }
+
+  socket.on('cursor-leave', ({ id }) => removeCursor(id));
+  socket.on('user-left',    ({ id }) => removeCursor(id));
+
+  socket.on('user-count', (count) => {
+    userCountEl.textContent = count;
+  });
+</script>
+</body>
+</html>
