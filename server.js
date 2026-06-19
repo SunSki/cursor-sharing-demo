@@ -10,15 +10,18 @@ const httpServer = createServer(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve the browser client straight from the package so the demo's
-// <script src="/livecursors.js"> stays in sync with what we'd publish.
+// Serve the browser client — CORS header lets any site load this script.
 app.get('/livecursors.js', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
   res.type('application/javascript');
   res.sendFile(require.resolve('@livecursors/client'));
 });
 
-// The one integration line: real-time cursor relay on /livecursors.
-attachCursors(httpServer, { path: '/livecursors' });
+// Relay — CORS open so any external site can connect to this relay server.
+attachCursors(httpServer, {
+  path: '/livecursors',
+  cors: { origin: '*', methods: ['GET', 'POST'] },
+});
 
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => console.log(`http://localhost:${PORT}`));
