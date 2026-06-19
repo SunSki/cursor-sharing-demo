@@ -124,6 +124,23 @@ node test-site/server.js  # http://localhost:4000
 GitHub push で Render が自動ビルド（autoDeploy: yes）。  
 `node server.js` が起動コマンド。Render 無料プランは15分でスリープ。
 
+## デザインシステム
+
+**ブランド名: DotSync**。ロゴ作成済み。
+
+カラートークンは `design-tokens.json`（リポジトリルート）が唯一の管理場所。
+
+| トークン | 値 | 用途 |
+|---|---|---|
+| primary | `#00C2A8` | ボタン・アクティブ状態・アクセント |
+| primaryDark | `#00A892` | ホバー時 |
+| primaryLight | `#E6FAF8` | アクティブ背景 |
+| primaryMid | `#7DDFD4` | ホバーボーダー |
+| surfaceDark | `#1a1a2e` | ヘッダー・ダーク背景 |
+
+**拡張機能 (`extension/popup.html`)** は CSS カスタムプロパティ（`--primary` 等）でトークンを参照している。  
+新しくUIに色を追加するときは `design-tokens.json` を参照し、既存トークンを使うこと。
+
 ## 主要ドキュメント
 
 - `README.md` — 概要と使い方（日本語）
