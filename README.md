@@ -18,8 +18,8 @@
 Node.js 不要。`index.html` だけのサイトにも追加できます。
 
 ```html
-<script src="https://cursor-sharing-demo.onrender.com/livecursors.js"
-        data-server="https://cursor-sharing-demo.onrender.com"
+<script src="https://dotsync.onrender.com/livecursors.js"
+        data-server="https://dotsync.onrender.com"
         data-room="auto"
         data-path="/livecursors"></script>
 ```

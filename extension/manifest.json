@@ -5,7 +5,7 @@
   "description": "__MSG_extDescription__",
   "default_locale": "en",
   "permissions": ["storage"],
-  "host_permissions": ["https://cursor-sharing-demo.onrender.com/*"],
+  "host_permissions": ["https://dotsync.onrender.com/*"],
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
