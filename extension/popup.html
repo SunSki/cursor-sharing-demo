@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <style>
@@ -24,25 +24,22 @@
 <body>
   <div class="head"><span class="mark"></span><h1>LiveCursors</h1></div>
   <div class="body">
-    <div id="status" class="status off">OFF — ルームコード未設定</div>
+    <div id="status" class="status off"></div>
 
     <div class="field">
-      <span>ルームコード（最大20文字・空欄でOFF）</span>
+      <span data-i18n="labelRoomCode"></span>
       <div class="code-row">
-        <input type="text" id="roomCode" placeholder="例: team2026" maxlength="20" autocomplete="off">
-        <button class="gen" id="gen" title="ランダム生成">生成</button>
+        <input type="text" id="roomCode" maxlength="20" autocomplete="off">
+        <button class="gen" id="gen" data-i18n="btnGenerate"></button>
       </div>
     </div>
 
     <div class="field">
-      <span>表示名（空欄でランダム）</span>
-      <input type="text" id="userName" placeholder="例: なつき" maxlength="20" autocomplete="off">
+      <span data-i18n="labelUserName"></span>
+      <input type="text" id="userName" maxlength="20" autocomplete="off">
     </div>
 
-    <div class="note">
-      同じコードを入力した人が同じページを開いていると、お互いのカーソルが見えます。
-      コードを共有したい相手にだけ伝えてください。
-    </div>
+    <div class="note" data-i18n="noteText"></div>
   </div>
   <script src="popup.js"></script>
 </body>

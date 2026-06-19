@@ -31,7 +31,7 @@
     ].join(';');
     el.innerHTML =
       '<span style="width:8px;height:8px;border-radius:50%;background:#4ade80;"></span>' +
-      '<span>LiveCursors <b data-livecursors-count>1</b></span>';
+      '<span>' + chrome.i18n.getMessage('badgeLabel') + ' <b data-livecursors-count>1</b></span>';
     document.body.appendChild(el);
     requestAnimationFrame(function () { el.style.opacity = '1'; });
     return el;

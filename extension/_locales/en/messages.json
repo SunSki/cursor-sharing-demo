@@ -1,0 +1,39 @@
+{
+  "extName": {
+    "message": "LiveCursors — Share cursors on the same page"
+  },
+  "extDescription": {
+    "message": "See each other's cursors in real time when you and your teammates open the same URL."
+  },
+  "actionTitle": {
+    "message": "LiveCursors"
+  },
+  "statusOn": {
+    "message": "ON — Room \"$CODE$\"",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "statusOff": {
+    "message": "OFF — No room code set"
+  },
+  "labelRoomCode": {
+    "message": "Room code (max 20 chars · empty = OFF)"
+  },
+  "placeholderRoomCode": {
+    "message": "e.g. team2026"
+  },
+  "btnGenerate": {
+    "message": "Generate"
+  },
+  "labelUserName": {
+    "message": "Display name (optional)"
+  },
+  "placeholderUserName": {
+    "message": "e.g. Alice"
+  },
+  "noteText": {
+    "message": "Anyone with the same code on the same page will see your cursor. Share the code only with people you trust."
+  },
+  "badgeLabel": {
+    "message": "LiveCursors"
+  }
+}

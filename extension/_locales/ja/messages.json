@@ -1,0 +1,39 @@
+{
+  "extName": {
+    "message": "LiveCursors — 同じページのカーソルを共有"
+  },
+  "extDescription": {
+    "message": "拡張機能を入れた人同士が同じURLを開いているとき、お互いのカーソルをリアルタイムで表示します。"
+  },
+  "actionTitle": {
+    "message": "LiveCursors"
+  },
+  "statusOn": {
+    "message": "ON — ルーム「$CODE$」",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "statusOff": {
+    "message": "OFF — ルームコード未設定"
+  },
+  "labelRoomCode": {
+    "message": "ルームコード（最大20文字・空欄でOFF）"
+  },
+  "placeholderRoomCode": {
+    "message": "例: team2026"
+  },
+  "btnGenerate": {
+    "message": "生成"
+  },
+  "labelUserName": {
+    "message": "表示名（空欄でランダム）"
+  },
+  "placeholderUserName": {
+    "message": "例: なつき"
+  },
+  "noteText": {
+    "message": "同じコードを入力した人が同じページを開いていると、お互いのカーソルが見えます。コードを共有したい相手にだけ伝えてください。"
+  },
+  "badgeLabel": {
+    "message": "LiveCursors"
+  }
+}

@@ -5,16 +5,29 @@ const statusEl = document.getElementById('status');
 
 const MAX = 20;
 
+// Apply Chrome i18n strings to the UI.
+function applyI18n() {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.dataset.i18n;
+    const msg = chrome.i18n.getMessage(key);
+    if (msg) el.textContent = msg;
+  });
+  codeEl.placeholder = chrome.i18n.getMessage('placeholderRoomCode');
+  nameEl.placeholder = chrome.i18n.getMessage('placeholderUserName');
+}
+
 function updateStatus() {
   const code = codeEl.value.trim();
   if (code) {
     statusEl.className = 'status on';
-    statusEl.textContent = 'ON — ルーム「' + code + '」';
+    statusEl.textContent = chrome.i18n.getMessage('statusOn', code);
   } else {
     statusEl.className = 'status off';
-    statusEl.textContent = 'OFF — ルームコード未設定';
+    statusEl.textContent = chrome.i18n.getMessage('statusOff');
   }
 }
+
+applyI18n();
 
 // Load current settings.
 chrome.storage.sync.get(['roomCode', 'userName'], (cfg) => {
