@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { width: 260px; margin: 0; font-family: system-ui, sans-serif; color: #1a1a2e; background: #fff; }
+    .head { background: #1a1a2e; color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
+    .head .mark { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg,#6366f1,#a855f7); }
+    .head h1 { font-size: 0.95rem; margin: 0; }
+    .body { padding: 16px; display: grid; gap: 14px; }
+    .row { display: flex; align-items: center; justify-content: space-between; }
+    .row label { font-size: 0.88rem; }
+    input[type=text] { width: 100%; padding: 8px 10px; border: 1px solid #e2e2ec; border-radius: 8px; font-size: 0.88rem; box-sizing: border-box; }
+    .field { display: grid; gap: 6px; }
+    .field span { font-size: 0.78rem; color: #64748b; }
+    /* toggle */
+    .switch { position: relative; width: 42px; height: 24px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: #cbd5e1; border-radius: 99px; transition: .2s; cursor: pointer; }
+    .slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    input:checked + .slider { background: #6366f1; }
+    input:checked + .slider::before { transform: translateX(18px); }
+    .note { font-size: 0.72rem; color: #94a3b8; line-height: 1.5; border-top: 1px solid #f0f0f5; padding-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="head"><span class="mark"></span><h1>LiveCursors</h1></div>
+  <div class="body">
+    <div class="row">
+      <label for="enabled">カーソル共有を有効にする</label>
+      <span class="switch">
+        <input type="checkbox" id="enabled" checked>
+        <span class="slider"></span>
+      </span>
+    </div>
+    <div class="field">
+      <span>表示名（空欄ならランダム）</span>
+      <input type="text" id="userName" placeholder="例: なつき" maxlength="20">
+    </div>
+    <div class="note">
+      同じURLを開いている他の利用者に、あなたのカーソル位置と表示名が共有されます。
+      変更後はページを再読み込みすると確実に反映されます。
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
