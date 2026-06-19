@@ -296,14 +296,14 @@
   const remoteCursors = {};
   let lastSent = 0;
 
-  document.addEventListener('mousemove', (e) => {
-    // Convert viewport coords → canvas coords
-    const rect = canvasEl.getBoundingClientRect();
-    const cx = (e.clientX - rect.left) / scale;
-    const cy = (e.clientY - rect.top)  / scale;
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-    // Ignore if outside canvas
-    if (cx < 0 || cx > CANVAS_W || cy < 0 || cy > CANVAS_H) return;
+  document.addEventListener('mousemove', (e) => {
+    // Convert viewport coords → canvas coords, clamped so the cursor never
+    // freezes in the letterbox margins around the scaled canvas.
+    const rect = canvasEl.getBoundingClientRect();
+    const cx = clamp((e.clientX - rect.left) / scale, 0, CANVAS_W);
+    const cy = clamp((e.clientY - rect.top)  / scale, 0, CANVAS_H);
 
     myCursorEl.style.left = cx + 'px';
     myCursorEl.style.top  = cy + 'px';
