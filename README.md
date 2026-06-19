@@ -70,6 +70,30 @@ server.js         demo: Express + attachCursors
 public/index.html demo page using the client
 ```
 
+## Reuse it in your own projects (without publishing)
+
+Build local tarballs and install them like any npm package — no registry:
+
+```bash
+npm run pack          # writes dist/livecursors-{server,client}-0.1.0.tgz
+```
+
+Then in another project:
+
+```bash
+npm install /path/to/cursor-sharing-demo/dist/livecursors-server-0.1.0.tgz \
+            /path/to/cursor-sharing-demo/dist/livecursors-client-0.1.0.tgz
+```
+
+`require('@livecursors/server')` / `import '@livecursors/client'` then work
+exactly as if installed from npm (socket.io is pulled in automatically).
+
+Other options for self-reuse:
+- **Local path dep** (same machine, auto-updates): add to package.json →
+  `"@livecursors/server": "file:../cursor-sharing-demo/packages/server"`.
+- **Just copy the file**: `packages/client/livecursors.js` is a standalone UMD —
+  drop it into any site's static folder and point `data-server` at a relay.
+
 ## Notes
 
 - The client auto-loads the socket.io browser library from a CDN; override with

@@ -7,7 +7,8 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "pack": "mkdir -p dist && npm pack -w @livecursors/server -w @livecursors/client --pack-destination dist"
   },
   "dependencies": {
     "@livecursors/server": "*",
