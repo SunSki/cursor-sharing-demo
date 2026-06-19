@@ -1,0 +1,53 @@
+{
+  "_comment": "Single source of truth for all extension UI strings. Run `npm run locales` to regenerate en/ and ja/messages.json. Never edit those files directly.",
+
+  "extName": {
+    "en": "LiveCursors — Share cursors on the same page",
+    "ja": "LiveCursors — 同じページのカーソルを共有"
+  },
+  "extDescription": {
+    "en": "See each other's cursors in real time when you and your teammates open the same URL.",
+    "ja": "拡張機能を入れた人同士が同じURLを開いているとき、お互いのカーソルをリアルタイムで表示します。"
+  },
+  "actionTitle": {
+    "en": "LiveCursors",
+    "ja": "LiveCursors"
+  },
+  "statusOn": {
+    "en": "ON — Room \"$CODE$\"",
+    "ja": "ON — ルーム「$CODE$」",
+    "placeholders": { "code": { "content": "$1" } }
+  },
+  "statusOff": {
+    "en": "OFF — No room code set",
+    "ja": "OFF — ルームコード未設定"
+  },
+  "labelRoomCode": {
+    "en": "Room code (max 20 chars · empty = OFF)",
+    "ja": "ルームコード（最大20文字・空欄でOFF）"
+  },
+  "placeholderRoomCode": {
+    "en": "e.g. team2026",
+    "ja": "例: team2026"
+  },
+  "btnGenerate": {
+    "en": "Generate",
+    "ja": "生成"
+  },
+  "labelUserName": {
+    "en": "Display name (optional)",
+    "ja": "表示名（空欄でランダム）"
+  },
+  "placeholderUserName": {
+    "en": "e.g. Alice",
+    "ja": "例: なつき"
+  },
+  "noteText": {
+    "en": "Anyone with the same code on the same page will see your cursor. Share the code only with people you trust.",
+    "ja": "同じコードを入力した人が同じページを開いていると、お互いのカーソルが見えます。コードを共有したい相手にだけ伝えてください。"
+  },
+  "badgeLabel": {
+    "en": "LiveCursors",
+    "ja": "LiveCursors"
+  }
+}

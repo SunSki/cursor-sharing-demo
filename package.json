@@ -8,7 +8,9 @@
   ],
   "scripts": {
     "start": "node server.js",
-    "pack": "mkdir -p dist && npm pack -w @livecursors/server -w @livecursors/client --pack-destination dist"
+    "pack": "mkdir -p dist && npm pack -w @livecursors/server -w @livecursors/client --pack-destination dist",
+    "locales": "node scripts/gen-locales.js",
+    "locales:check": "node scripts/gen-locales.js --check"
   },
   "dependencies": {
     "@livecursors/server": "*",

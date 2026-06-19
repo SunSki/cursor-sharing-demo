@@ -10,7 +10,11 @@
   },
   "statusOn": {
     "message": "ON — Room \"$CODE$\"",
-    "placeholders": { "code": { "content": "$1" } }
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
   },
   "statusOff": {
     "message": "OFF — No room code set"
